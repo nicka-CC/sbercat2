@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR сканер</title>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+  <link href="https://fonts.sberbank.ru/css?family=SB+Sans:300,400,500,600,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./src/css/style.css">
+  <style>
+    body {
+      background: #111;
+      color: white;
+    }
+    #cat-canvas {
+      position: absolute;
+      bottom: 14vh;
+      left: 10vw;
+      width: 120px;
+      z-index: 5;
+      pointer-events: none;
+      transform: translateZ(0);
+      will-change: transform;
+      image-rendering: auto;
+    }
+  </style>
+</head>
+<body>
+<div class="scanner-container">
+  <video id="video" autoplay playsinline></video>
+  <div class="scan-frame"></div>
+  <img class="image" src="QRborder.svg"/>
+  <video id="sbercat-video" playsinline muted loop autoplay style="display:none;"></video>
+
+  <canvas id="cat-canvas"></canvas>
+  <div class="hint">Наведи камеру на код</div>
+</div>
+
+<canvas id="qr-canvas"></canvas>
+
+<div id="orientation-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; color: white; display: flex; align-items: center; justify-content: center; z-index: 999999999;">
+  <p style="text-align: center; font-family: 'SB Sans', sans-serif; font-size: 1.5rem;">Пожалуйста, поверните экран</p>
+</div>
+
+<div id="camera-access-required"
+     style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; color: white; text-align: center; z-index: 99999999;">
+  <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+    <h1 style="font-size: 18px;">Требуется доступ к камере</h1>
+    <p style="font-size: 12px;">Пожалуйста, разрешите доступ к камере в настройках<br>браузера и обновите страницу.
+    </p>
+  </div>
+</div>
+
+<script src="src/js/station-common.js"></script>
+<script type="module" src="./src/js/scanner.js"></script>
+</body>
+</html>

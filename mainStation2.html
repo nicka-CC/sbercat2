@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <title>1 станция</title>
+    <link href="https://fonts.sberbank.ru/css?family=SB+Sans:300,400,500,600,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./src/css/style.css">
+    <link rel="stylesheet" href="./src/css/preloader.css">
+    <style>
+        #question-container {
+            position: fixed;
+            padding: 10px 40px;
+            margin: 20px auto 0;
+            text-align: left;
+        }
+        #video-container {
+            z-index: 3;
+        }
+        #video-container video {
+            min-width: 110%;
+        }
+        #progress-bar .step {
+            background: rgba(255, 255, 255, 0);
+        }
+    </style>
+</head>
+<body>
+<div id="preloader">
+    <div id="preloader-text">Загрузка...</div>
+    <div id="preloader-progress-container">
+        <div id="preloader-progress-bar"></div>
+    </div>
+</div>
+<script src="src/js/config.js"></script>
+<video id="webcam-feed" playsinline autoplay muted></video>
+<div id="main-container" class="hidden">
+    <div id="progress-bar" style="margin-top: 20px">
+        <div class="step" id="step1"></div>
+        <div class="step" id="step2"></div>
+        <div class="step" id="step3"></div>
+    </div>
+    <div id="question-containe" style="height:8vh; display:flex; justify-content:flex-end; align-items:center; margin: 1vh 0; padding-right: 10vw;">
+        <div id="skipVideoButton" style=" z-index: 1000; height: 100%; aspect-ratio: 1/1; border-radius: 50%; cursor: pointer; border:1px solid rgba(255, 255, 255, 0.4); background: #77777766 url(./svg/array.svg) no-repeat center; background-size: 70%; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display:none">
+        </div>
+    </div>
+    <div id="topAsk"></div>
+    <div id="video-container">
+        <video id="sbercat-video-1" playsinline src="mp4/cat_2_scene_25Fps.mp4"
+               style="position: absolute; width: 100%; height: 133%; object-fit: contain; display: none; z-index: 3;"></video>
+        <video id="sbercat-video-2" playsinline
+               style="position: absolute; width: 100%; height: 133%; object-fit: contain; display: none; z-index: 3;"></video>
+        <canvas id="cat-canvas"
+                style="position: absolute; width: 100%; height: 110%; object-fit: cover; z-index: 2;"></canvas>
+    </div>
+    <div class="third" id="third" style="height: 15vh; display:none"></div>
+
+
+</div>
+<div id="question-container" class="hidden"></div>
+<div id="ui" class="hidden">
+    <p id="desc">Смотри-ка, ты отлично справился — нашёл мои следы-подсказки!<br>Готов начать викторину?</p>
+    <div id="controls">
+        <button id="startBtn" class="primary">Вперед</button>
+    </div>
+</div>
+<div id="questionCounter" class="hidden"></div>
+<div id="kl" class="hidden"></div>
+<div id="soundOverlay" class="hidden">
+    <div class="soundBox">
+        <button id="soundStartBtn" >Погнали!</button>
+    </div>
+</div>
+
+<div id="blur-overlay"></div>
+
+<div id="interaction-required-popup"
+     style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); background: rgba(0,0,0,0.25); z-index: 9999999; display: none; align-items: center; justify-content: center;">
+    <div class="soundBox">
+        <button id="interaction-btn"
+                style="font-size: 42px; padding: 30px 70px; border-radius: 90px; background: linear-gradient(100deg, rgba(250, 237, 0, 1), rgba(88, 213, 105, 1),rgba(32, 199, 209, 1)); color: white; border: none; cursor: pointer;">
+            Погнали!
+        </button>
+    </div>
+</div>
+<div id="orientation-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; color: white; display: flex; align-items: center; justify-content: center; z-index: 999999999;">
+    <p style="font-size: 5vw; text-align: center;">Пожалуйста, поверните экран</p>
+</div>
+<script src="src/js/webgl-video-processor.js"></script>
+<script src="src/js/station-configs.js"></script>
+<script src="src/js/station-common.js"></script>
+<script src="src/js/preloader.js"></script>
+<script>
+    window.addEventListener('pageshow', function (event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const STATION_NUMBER = 2;
+        const config = stationConfigs[STATION_NUMBER];
+        if (config) {
+            const elementsToUnhide = ['main-container', 'question-container', 'ui', 'questionCounter', 'kl', 'soundOverlay'];
+            // Start the preloading process
+            preloadAssets(config, () => {
+                initializeApp(config, STATION_NUMBER);
+            }, elementsToUnhide);
+        } else {
+            console.error(`Configuration for station ${STATION_NUMBER} not found.`);
+        }
+    });
+</script>
+<!--<div id="camera-access-required"-->
+<!--     style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; color: white; text-align: center; z-index: 99999999;">-->
+<!--    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">-->
+<!--        <h1 style="font-size: 60px;">Требуется доступ к камере</h1>-->
+<!--        <p style="font-size: 40px;">Пожалуйста, разрешите доступ к камере в настройках<br>браузера и обновите страницу.-->
+<!--        </p>-->
+<!--    </div>-->
+<!--</div>-->
+</body>
+</html>

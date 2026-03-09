@@ -1,0 +1,28 @@
+stages:
+- build-docker
+- deploy
+
+variables:
+  CI_DEBUG_TRACE: "true"
+sbercat-docker-image:
+  stage: build-docker
+  only:
+    refs:
+      - developer
+  tags:
+    - sbercat-docker-dev
+  script:
+    - 'docker build -t sbercat-sevice:developer .'
+sbercat-docker-deploy-docker:
+  image: sbercat-sevice:developer
+  stage: deploy
+  only:
+    refs:
+    - developer
+  tags:
+    - sbercat-shell-dev
+  script:
+    - 'df -h'
+    - 'docker-compose down'
+    - 'docker-compose up -d'
+    - 'docker image prune -f'

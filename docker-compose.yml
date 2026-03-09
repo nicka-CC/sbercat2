@@ -1,0 +1,20 @@
+services:
+  webxr-ar:
+    image: sbercat-sevice:developer
+    mem_limit: "2g"
+    memswap_limit: "2g"
+    cpus: "1.0"
+    container_name: sbercat-sevice
+    volumes:
+      - .:/usr/share/nginx/html
+    ports:
+      - "${PORT}:80"
+    restart: always
+    networks:
+      services_gateway:
+        ipv4_address: 10.1.0.56
+        
+
+networks:
+  services_gateway:
+    external: true

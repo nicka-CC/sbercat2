@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <title>Финал</title>
+    <link href="https://fonts.sberbank.ru/css?family=SB+Sans:300,400,500,600,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./src/css/style.css">
+    <style>
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.42);
+        }
+        #question-container {
+            flex: 0 0 auto;
+            padding: 0 40px;
+            height: 14.5vh;
+            margin: 8vh auto 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        #cat-container video {
+            min-width: 100%;
+        }
+        #video-container video, #cat-container video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -52%);
+            width: 100%;
+            height: 133%;
+            object-fit: contain;
+            display: none;
+            z-index: 3;
+        }
+    </style>
+</head>
+<body>
+<script src="src/js/config.js"></script>
+<div id="soundOverlay">
+    <div class="soundBox">
+<!--        <div style="color:white; font-size: 60px; margin-bottom: 30px">Готов посмотреть результат?</div>-->
+        <button id="soundStartBtn">Смотреть!</button>
+    </div>
+</div>
+
+<div id="main-content">
+    <video id="arjs-video" playsinline autoplay muted></video>
+
+    <div id="main-container">
+        <div id="progress-bar" style="margin-top: 20px">
+            <div class="step" id="step1"></div>
+            <div class="step" id="step2"></div>
+            <div class="step" id="step3"></div>
+        </div>
+        <div id="question-container">
+            <div id="final-points" style="
+                font-size:40px;
+                font-weight:700;
+                height: 13.5vh;
+                overflow: hidden;
+                word-wrap: break-word;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            ">
+            </div>
+        </div>
+        <div id="cat-container">
+            <canvas id="cat-canvas"></canvas>
+            <video id="sbercat-video" playsinline muted style="display: none;">
+                Ваш браузер не поддерживает видео.
+            </video>
+            <video id="sbercat-video-2" playsinline muted style="display: none;"></video>
+            <video id="sbercat-video-3" playsinline muted style="display: none;"></video>
+        </div>
+        <div class="third" style="height: 15vh"></div>
+    </div>
+
+    <div id="final-ui" style="display: none;"></div>
+
+    <div id="final-ui2" style="
+      position: fixed;
+      bottom: 4%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90vw;
+      padding: 30px;
+      background: rgba(0,0,0,0);
+      border-radius: 35px;
+      text-align: center;
+      color: white;
+      font-family: sans-serif;
+      font-size: 40px;
+      display: none;
+      z-index: 1001;">
+        <button id="shareBtn" style="
+        width: 100%;
+        padding: 20px;
+        height: 140px;
+        margin-bottom: 20px;
+        border-radius: 90px;
+        border:none;
+        font-size:40px;
+        color:white;
+        background: linear-gradient(100deg, rgba(250, 237, 0, 1), rgba(88, 213, 105, 1),rgba(32, 199, 209, 1));
+      ">Поделиться
+        </button>
+
+        <button id="retryBtn" style="
+        width: 100%;
+        padding: 20px;
+        height: 140px;
+        border-radius: 90px;
+        border:none;
+        font-size:40px;
+        color:white;
+        background: rgba(255,255,255,0.25);
+      ">Пройти ещё раз
+        </button>
+    </div>
+
+</div>
+
+<div id="interaction-required-popup"
+     style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); background: rgba(0,0,0,0.25); z-index: 9999999; display: none; align-items: center; justify-content: center;">
+    <div class="soundBox">
+        <div style="color:white; font-size: 60px; margin-bottom: 30px">Готов начать?</div>
+        <button id="interaction-btn"
+                style="font-size: 42px; padding: 30px 70px; border-radius: 90px; background: linear-gradient(100deg, rgba(250, 237, 0, 1), rgba(88, 213, 105, 1),rgba(32, 199, 209, 1)); color: white; border: none; cursor: pointer;">
+            Готов
+        </button>
+    </div>
+</div>
+<div id="blur-overlay"></div>
+<div id="orientation-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; color: white; display: flex; align-items: center; justify-content: center; z-index: 999999999;">
+    <p style="font-size: 5vw; text-align: center;">Пожалуйста, поверните экран</p>
+</div>
+
+<script>
+    function checkOrientation() {
+        const overlay = document.getElementById('orientation-overlay');
+        // Show overlay if width is greater than height (landscape orientation)
+        if (window.innerWidth > window.innerHeight) {
+            overlay.style.display = 'flex';
+        } else {
+            overlay.style.display = 'none';
+        }
+    }
+
+    // Initial check on page load
+    document.addEventListener('DOMContentLoaded', checkOrientation);
+    // Re-check on window resize and orientation change events
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', checkOrientation);
+    const urlParams = getUrlParams();
+    const SCENE_UUID = urlParams.uuid || '21e41c43-b5b1-490a-a27f-beb3331ee483';
+    const STATION = urlParams.station ? parseInt(urlParams.station) : 5;
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    let catCanvas, catCtx, activeVideo;
+    let videos;
+    let totalBalls = 0;
+    async function startWebcam() {
+        const webcamFeed = document.getElementById('arjs-video');
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: {ideal: "environment"},
+                    width: {ideal: 1280},
+                    height: {ideal: 720},
+                    frameRate: {ideal: 24, max: 24}
+                },
+                audio: false
+            });
+            webcamFeed.srcObject = stream;
+        } catch (err) {
+            console.error("Error accessing webcam: ", err);
+            document.getElementById('camera-access-required').style.display = 'block';
+        }
+    }
+
+    function getPlatformVideoSrc(src) {
+        if (isAndroid) {
+            return src.replace(/\.mp4$/, '.webm');
+        }
+        return src;
+    }
+
+    function playVideo(src, loop = false) {
+        const nextVideo = videos.find(v => v !== activeVideo);
+        if (!nextVideo) return;
+
+        const videoSrc = getPlatformVideoSrc(src);
+
+        nextVideo.pause();
+        nextVideo.currentTime = 0;
+        nextVideo.src = videoSrc;
+        nextVideo.loop = loop;
+        nextVideo.muted = false;
+        nextVideo.load();
+
+        const playPromise = nextVideo.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                if (activeVideo) {
+                    activeVideo.pause();
+                    activeVideo.style.display = 'none';
+                }
+                activeVideo = nextVideo;
+                if (isAndroid) {
+                    activeVideo.style.display = 'block';
+                    catCanvas.style.display = 'none';
+                } else {
+                    activeVideo.style.display = 'none';
+                    catCanvas.style.display = 'block';
+                }
+            }).catch(error => {
+                console.error("Video play failed:", error);
+            });
+        }
+    }
+
+    function applyChromaKey(videoElement) {
+        if (isAndroid || !catCtx || !catCanvas || !videoElement.videoWidth) return;
+
+        const catContainer = document.getElementById('cat-container');
+        if (!catContainer) return;
+
+        catCanvas.width = catContainer.offsetWidth;
+        catCanvas.height = catContainer.offsetHeight;
+        catCtx.clearRect(0, 0, catCanvas.width, catCanvas.height);
+
+        const cropPercent = 0.13;
+        const sx = 0;
+        const sy = videoElement.videoHeight * cropPercent;
+        const sWidth = videoElement.videoWidth;
+        const sHeight = videoElement.videoHeight * (1 - cropPercent);
+
+        const videoRatio = sWidth / sHeight;
+        const canvasRatio = catCanvas.width / catCanvas.height;
+        let drawWidth, drawHeight, offsetX, offsetY;
+
+        if (videoRatio > canvasRatio) {
+            drawWidth = catCanvas.width;
+            drawHeight = drawWidth / videoRatio;
+            offsetX = 0;
+            offsetY = (catCanvas.height - drawHeight) / 2;
+        } else {
+            drawHeight = catCanvas.height;
+            drawWidth = drawHeight * videoRatio;
+            offsetY = 0;
+            offsetX = (catCanvas.width - drawWidth) / 2;
+        }
+
+        catCtx.drawImage(videoElement, sx, sy, sWidth, sHeight, offsetX, offsetY, drawWidth, drawHeight);
+
+        try {
+            const frame = catCtx.getImageData(0, 0, catCanvas.width, catCanvas.height);
+            const d = frame.data;
+            const threshold = 60;
+            const maxGreen = 180;
+
+            for (let i = 0; i < d.length; i += 4) {
+                const r = d[i];
+                const g = d[i + 1];
+                const b = d[i + 2];
+
+                if (b > r + threshold && b > g + threshold && g < maxGreen) {
+                    d[i + 3] = 0;
+                }
+            }
+            catCtx.putImageData(frame, 0, 0);
+        } catch (e) {
+            console.error("Chroma key error:", e);
+        }
+    }
+
+    function renderLoop() {
+        requestAnimationFrame(renderLoop);
+        if (activeVideo && !activeVideo.paused) {
+            if (!isAndroid) {
+                applyChromaKey(activeVideo);
+            }
+        }
+    }
+
+
+    function init() {
+        startWebcam();
+        catCanvas = document.getElementById('cat-canvas');
+
+        if (isAndroid) {
+            catCanvas.style.display = 'none';
+        } else {
+            catCtx = catCanvas.getContext('2d', {willReadFrequently: true});
+        }
+
+        videos = [
+            document.getElementById('sbercat-video'),
+            document.getElementById('sbercat-video-2'),
+            document.getElementById('sbercat-video-3')
+        ];
+        activeVideo = videos[0];
+
+
+        videos.forEach(v => {
+            v.addEventListener('ended', function () {
+                if (!v.loop) {
+                    playVideo('mp4/waiting_coffe_25Fps.mp4', true);
+                }
+            });
+        });
+    }
+    const soundStartBtn = document.getElementById('soundStartBtn');
+    soundStartBtn.addEventListener('click', () => {
+        videos.forEach(v => v.muted = false);
+        soundOverlay.style.display = 'none';
+        totalBalls = localStorage.getItem('total_balls') || 0;
+        finishQuiz();
+    });
+    function finishQuiz() {
+        const finalUI = document.getElementById("final-ui");
+        finalUI.style.display = "block";
+        playVideo('mp4/waiting_coffe_25Fps.mp4', false);
+
+        document.getElementById("final-points").innerHTML = `
+          <div>
+            <div >Приходи в офис Сбера по адресу: Псков, Октябрьский пр., 23/25, пройди игру и получи диплом и приятный сюрприз.</div>
+            <div>До встречи, котан!</div>
+          </div>
+        `;
+    }
+    init();
+    renderLoop();
+</script>
+<div id="camera-access-required"
+     style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; color: white; text-align: center; z-index: 99999999;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <h1 style="font-size: 60px;">Требуется доступ к камере</h1>
+        <p style="font-size: 40px;">Пожалуйста, разрешите доступ к камере в настройках<br>браузера и обновите страницу.
+        </p>
+    </div>
+</div>
+</body>
+</html>
