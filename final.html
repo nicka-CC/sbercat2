@@ -5,6 +5,7 @@
     <title>Финал</title>
     <link href="https://fonts.sberbank.ru/css?family=SB+Sans:300,400,500,600,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./src/css/style.css">
+    <link rel="stylesheet" href="./src/css/preloader.css">
     <style>
         html, body {
             width: 100vw;
@@ -28,6 +29,12 @@
     </style>
 </head>
 <body>
+<div id="preloader">
+    <div id="preloader-text">Загрузка...</div>
+    <div id="preloader-progress-container">
+        <div id="preloader-progress-bar"></div>
+    </div>
+</div>
 <script src="src/js/webgl-video-processor.js"></script>
 <script src="src/js/config.js"></script>
 <div id="soundOverlay">
@@ -134,10 +141,10 @@
 </div>
 <div id="blur-overlay"></div>
 <div id="orientation-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; color: white; display: flex; align-items: center; justify-content: center; z-index: 999999999;">
-    <p style="font-size: 5vw; text-align: center;">Пожалуйста, поверните экран</p>
+  <p style="font-size: 5vw; text-align: center;">Пожалуйста, поверните экран</p>
 </div>
+<script src="src/js/preloader.js"></script>
 <script>
-
     function checkOrientation() {
         const overlay = document.getElementById('orientation-overlay');
         // Show overlay if width is greater than height (landscape orientation)
@@ -159,6 +166,7 @@
     const SCENE_UUID = urlParams.uuid || '21e41c43-b5b1-490a-a27f-beb3331ee483';
     const STATION = urlParams.station ? parseInt(urlParams.station) : 5;
     const isAndroid = /Android/i.test(navigator.userAgent);
+    const isBudgetDevice = isAndroid && (!navigator.deviceMemory || navigator.deviceMemory < 8);
     let catCanvas, webglProcessor, activeVideo;
     let videos;
     let totalBalls = 0;
@@ -220,16 +228,26 @@
     }
     async function startWebcam() {
         const webcamFeed = document.getElementById('arjs-video');
+        const isBudgetAndroid = /Android/i.test(navigator.userAgent) && (navigator.deviceMemory || 8) < 8;
+
+        let videoConstraints = {
+            video: {
+                facingMode: { ideal: "environment" },
+                width: { ideal: 1280 },
+                height: { ideal: 720 },
+                frameRate: { ideal: 24, max: 24 }
+            },
+            audio: false
+        };
+
+        if (isBudgetAndroid) {
+            videoConstraints.video.width = { ideal: 240 };
+            videoConstraints.video.height = { ideal: 480 };
+            videoConstraints.video.frameRate = { ideal: 15, max: 15 };
+        }
+
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: {ideal: "environment"},
-                    width: {ideal: 1280},
-                    height: {ideal: 720},
-                    frameRate: { ideal: 24, max: 24 }
-                },
-                audio: false
-            });
+            const stream = await navigator.mediaDevices.getUserMedia(videoConstraints);
             webcamFeed.srcObject = stream;
         } catch (err) {
             console.error("Error accessing webcam: ", err);
@@ -303,7 +321,7 @@
     }
 
     function applyChromaKey(videoElement) {
-        if (isAndroid || !webglProcessor || !videoElement.videoWidth) return;
+        if (isBudgetDevice || !webglProcessor || !videoElement.videoWidth) return;
 
         const cropPercent = 0.13;
         const crop = {
@@ -488,7 +506,15 @@
             window.location.href = "qr.html";
         };
     }
-    init();
+    const finalAssetsConfig = {
+        video1: 'mp4/Scen_5_25fps.mp4',
+        video2: 'mp4/cat_2_scene_wrong_station_25Fps 2_1.mp4',
+        video3: 'mp4/waiting_coffe_25Fps.mp4',
+        svg1: './svg/array.svg'
+    };
+
+    preloadAssets(finalAssetsConfig, init, ['main-content', 'final-ui', 'final-ui2', 'soundOverlay']);
+
     if (!isAndroid) {
         renderLoop();
     }

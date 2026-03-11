@@ -193,6 +193,7 @@
 
 
     const isAndroid = /Android/i.test(navigator.userAgent);
+    const isBudgetDevice = isAndroid && (!navigator.deviceMemory || navigator.deviceMemory < 8);
     let catCanvas, webglProcessor, activeVideo;
     let userHasStarted = false;
     let isWrongStationHandled = false;
@@ -207,16 +208,26 @@
     }, { passive: false });
     async function startWebcam() {
         const webcamFeed = document.getElementById('webcam-feed');
+        const isBudgetAndroid = /Android/i.test(navigator.userAgent) && (navigator.deviceMemory || 8) < 8;
+
+        let videoConstraints = {
+            video: {
+                facingMode: { ideal: "environment" },
+                width: { ideal: 1280 },
+                height: { ideal: 720 },
+                frameRate: { ideal: 24, max: 24 }
+            },
+            audio: false
+        };
+
+        if (isBudgetAndroid) {
+            videoConstraints.video.width = { ideal: 240 };
+            videoConstraints.video.height = { ideal: 480 };
+            videoConstraints.video.frameRate = { ideal: 15, max: 15 };
+        }
+
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: {ideal: "environment"},
-                    width: {ideal: 1280},
-                    height: {ideal: 720},
-                    frameRate: {ideal: 24, max: 24}
-                },
-                audio: false
-            });
+            const stream = await navigator.mediaDevices.getUserMedia(videoConstraints);
 
             webcamFeed.srcObject = stream;
             currentWebcamStream = stream; // Store the stream
@@ -341,7 +352,7 @@
     }
 
     function applyChromaKey(videoElement) {
-        if (isAndroid || !webglProcessor || !videoElement.videoWidth) return;
+        if (isBudgetDevice || !webglProcessor || !videoElement.videoWidth) return;
 
         const cropPercent = 0.15;
         const crop = {

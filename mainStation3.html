@@ -5,6 +5,7 @@
   <title>2 станция</title>
   <link href="https://fonts.sberbank.ru/css?family=SB+Sans:300,400,500,600,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./src/css/style.css">
+  <link rel="stylesheet" href="./src/css/preloader.css">
   <style>
     #question-container {
       position: fixed;
@@ -24,6 +25,12 @@
   </style>
 </head>
 <body>
+<div id="preloader">
+    <div id="preloader-text">Загрузка...</div>
+    <div id="preloader-progress-container">
+        <div id="preloader-progress-bar"></div>
+    </div>
+</div>
 <script src="src/js/config.js"></script>
 <video id="webcam-feed" playsinline autoplay muted></video>
 <div id="main-container">
@@ -81,6 +88,7 @@
 <script src="src/js/webgl-video-processor.js"></script>
 <script src="src/js/station-configs.js"></script>
 <script src="src/js/station-common.js"></script>
+<script src="src/js/preloader.js"></script>
 <script>
   window.addEventListener('pageshow', function (event) {
     if (event.persisted) {
@@ -93,7 +101,11 @@
     const STATION_NUMBER = 3;
     const config = stationConfigs[STATION_NUMBER];
     if (config) {
-      initializeApp(config, STATION_NUMBER);
+      const elementsToUnhide = ['main-container', 'question-container', 'ui', 'questionCounter', 'kl', 'soundOverlay'];
+      // Start the preloading process
+      preloadAssets(config, () => {
+          initializeApp(config, STATION_NUMBER);
+      }, elementsToUnhide);
     } else {
       console.error(`Configuration for station ${STATION_NUMBER} not found.`);
     }

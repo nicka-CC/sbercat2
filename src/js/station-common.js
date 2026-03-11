@@ -120,13 +120,13 @@ function initializeApp(stationConfig, stationNumber) {
             const fileName = currentSrc.split('/').pop();
 
             const isSpecialVideoByFullPath = currentSrc.includes(waitingVideo) ||
-                                            currentSrc.includes(correctAnswerVideo) ||
-                                            currentSrc.includes(wrongAnswerVideo) ||
-                                            (newStationVideo && currentSrc.includes(getPlatformVideoSrc(newStationVideo)));
+                currentSrc.includes(correctAnswerVideo) ||
+                currentSrc.includes(wrongAnswerVideo) ||
+                (newStationVideo && currentSrc.includes(getPlatformVideoSrc(newStationVideo)));
 
             const isSpecialVideoByFileName = fileName.includes('waiting') ||
-                                             fileName.includes('Da') ||
-                                             fileName.includes('NO');
+                fileName.includes('Da') ||
+                fileName.includes('NO');
 
             if (!isSpecialVideoByFullPath && !isSpecialVideoByFileName) {
                 shouldShow = true;
@@ -539,16 +539,25 @@ function initializeApp(stationConfig, stationNumber) {
     async function startWebcam() {
         console.log('cam')
         const videoElement = document.getElementById('webcam-feed');
+        const isBudgetAndroid = /Android/i.test(navigator.userAgent) && (navigator.deviceMemory || 8) < 8;
+
+        let videoConstraints = {
+            video: {
+                facingMode: { ideal: "environment" },
+                width: { ideal: 1280 },
+                height: { ideal: 720 },
+                frameRate: { ideal: 24, max: 24 }
+            },
+            audio: false
+        };
+
+        if (isBudgetAndroid) {
+            videoConstraints.video.width = { ideal: 240 };
+            videoConstraints.video.height = { ideal: 480 };
+            videoConstraints.video.frameRate = { ideal: 15, max: 15 };
+        }
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: { ideal: "environment" },
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 },
-                    frameRate: { ideal: 24, max: 24 }
-                },
-                audio: false
-            });
+            const stream = await navigator.mediaDevices.getUserMedia(videoConstraints);
             videoElement.srcObject = stream;
             currentWebcamStream = stream;
         } catch (err) {
@@ -588,7 +597,7 @@ function initializeApp(stationConfig, stationNumber) {
 
     function renderLoop() {
         if (activeVideo && !activeVideo.paused && !activeVideo.ended) {
-                applyChromaKey(activeVideo);
+            applyChromaKey(activeVideo);
         }
         // updateSkipButtonVisibility();
         requestAnimationFrame(renderLoop);
@@ -645,7 +654,7 @@ function initializeApp(stationConfig, stationNumber) {
             videoEndedCallback(this);
         });
     });
-    
+
     const currentFile = window.location.pathname.split('/').pop();
     let expectedStation = localStorage.getItem('currentStation');
 
