@@ -5,7 +5,6 @@
     <title>Финал</title>
     <link href="https://fonts.sberbank.ru/css?family=SB+Sans:300,400,500,600,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./src/css/style.css">
-    <link rel="stylesheet" href="./src/css/preloader.css">
     <style>
         html, body {
             width: 100vw;
@@ -32,7 +31,6 @@
             left: 50%;
             transform: translate(-50%, -52%);
             width: 100%;
-            height: 133%;
             object-fit: contain;
             display: none;
             z-index: 3;
@@ -40,16 +38,11 @@
     </style>
 </head>
 <body>
-<div id="preloader">
-    <div id="preloader-text">Загрузка...</div>
-    <div id="preloader-progress-container">
-        <div id="preloader-progress-bar"></div>
-    </div>
-</div>
 <script src="src/js/config.js"></script>
+<script src="src/js/common-functions.js"></script>
 <div id="soundOverlay">
     <div class="soundBox">
-<!--        <div style="color:white; font-size: 60px; margin-bottom: 30px">Готов посмотреть результат?</div>-->
+        <!--        <div style="color:white; font-size: 60px; margin-bottom: 30px">Готов посмотреть результат?</div>-->
         <button id="soundStartBtn">Смотреть!</button>
     </div>
 </div>
@@ -65,7 +58,7 @@
         </div>
         <div id="question-container">
             <div id="final-points" style="
-                font-size:40px;
+
                 font-weight:700;
                 height: 13.5vh;
                 overflow: hidden;
@@ -79,13 +72,13 @@
         </div>
         <div id="cat-container">
             <canvas id="cat-canvas"></canvas>
-            <video id="sbercat-video" playsinline muted style="display: none;">
+            <video id="sbercat-video-1" playsinline muted crossorigin="anonymous" style="display: none;">
                 Ваш браузер не поддерживает видео.
             </video>
-            <video id="sbercat-video-2" playsinline muted style="display: none;"></video>
-            <video id="sbercat-video-3" playsinline muted style="display: none;"></video>
+            <video id="sbercat-video-2" playsinline muted crossorigin="anonymous" style="display: none;"></video>
+            <video id="sbercat-video-3" playsinline muted crossorigin="anonymous" style="display: none;"></video>
         </div>
-        <div class="third" style="height: 15vh"></div>
+        <div class="third" id="third" style="height: 15vh"></div>
     </div>
 
     <div id="final-ui" style="display: none;"></div>
@@ -145,10 +138,11 @@
 </div>
 <div id="blur-overlay"></div>
 <div id="orientation-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; color: white; display: flex; align-items: center; justify-content: center; z-index: 999999999;">
-  <p style="font-size: 5vw; text-align: center;">Пожалуйста, поверните экран</p>
+    <p style="font-size: 5vw; text-align: center;">Пожалуйста, поверните экран</p>
 </div>
-<script src="src/js/preloader.js"></script>
-<script>    function checkOrientation() {
+
+<script>
+    function checkOrientation() {
         const overlay = document.getElementById('orientation-overlay');
         // Show overlay if width is greater than height (landscape orientation)
         if (window.innerWidth > window.innerHeight) {
@@ -157,7 +151,20 @@
             overlay.style.display = 'none';
         }
     }
+    function fitTextToContainer(container, baseFontSize = 30, minFontSize = 5) {
+        const innerDiv = container.firstElementChild;
+        if (!innerDiv) return;
 
+        let fontSize = baseFontSize;
+        innerDiv.style.fontSize = fontSize + 'px';
+
+        const maxHeight = container.clientHeight;
+
+        while (innerDiv.scrollHeight > maxHeight && fontSize > minFontSize) {
+            fontSize -= 5;
+            innerDiv.style.fontSize = fontSize + 'px';
+        }
+    }
     // Initial check on page load
     document.addEventListener('DOMContentLoaded', checkOrientation);
     // Re-check on window resize and orientation change events
@@ -166,33 +173,21 @@
     const urlParams = getUrlParams();
     const SCENE_UUID = urlParams.uuid || '21e41c43-b5b1-490a-a27f-beb3331ee483';
     const STATION = urlParams.station ? parseInt(urlParams.station) : 5;
-    const isAndroid = /Android/i.test(navigator.userAgent);
-    const isBudgetDevice = isAndroid && (!navigator.deviceMemory || navigator.deviceMemory < 8);
     let catCanvas, catCtx, activeVideo;
     let videos;
     let totalBalls = 0;
     async function startWebcam() {
         const webcamFeed = document.getElementById('arjs-video');
-        const isBudgetAndroid = /Android/i.test(navigator.userAgent) && (navigator.deviceMemory || 8) < 8;
-
-        let videoConstraints = {
-            video: {
-                facingMode: { ideal: "environment" },
-                width: { ideal: 1280 },
-                height: { ideal: 720 },
-                frameRate: { ideal: 24, max: 24 }
-            },
-            audio: false
-        };
-
-        if (isBudgetAndroid) {
-            videoConstraints.video.width = { ideal: 240 };
-            videoConstraints.video.height = { ideal: 480 };
-            videoConstraints.video.frameRate = { ideal: 15, max: 15 };
-        }
-
         try {
-            const stream = await navigator.mediaDevices.getUserMedia(videoConstraints);
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: {ideal: "environment"},
+                    width: {ideal: 1280},
+                    height: {ideal: 720},
+                    frameRate: {ideal: 24, max: 24}
+                },
+                audio: false
+            });
             webcamFeed.srcObject = stream;
         } catch (err) {
             console.error("Error accessing webcam: ", err);
@@ -200,12 +195,7 @@
         }
     }
 
-    function getPlatformVideoSrc(src) {
-        if (isAndroid) {
-            return src.replace(/\.mp4$/, '.webm');
-        }
-        return src;
-    }
+
 
     function playVideo(src, loop = false) {
         const nextVideo = videos.find(v => v !== activeVideo);
@@ -242,7 +232,7 @@
     }
 
     function applyChromaKey(videoElement) {
-        if (isBudgetDevice || !catCtx || !catCanvas || !videoElement.videoWidth) return;
+        if (isAndroid || !catCtx || !catCanvas || !videoElement.videoWidth) return;
 
         const catContainer = document.getElementById('cat-container');
         if (!catContainer) return;
@@ -317,7 +307,7 @@
         }
 
         videos = [
-            document.getElementById('sbercat-video'),
+            document.getElementById('sbercat-video-1'),
             document.getElementById('sbercat-video-2'),
             document.getElementById('sbercat-video-3')
         ];
@@ -327,7 +317,7 @@
         videos.forEach(v => {
             v.addEventListener('ended', function () {
                 if (!v.loop) {
-                    playVideo('mp4/waiting_coffe_25Fps.mp4', true);
+                    playVideo('https://sbercat.tourverse.ru/vid-4/waiting_coffe_25Fps.mp4', true);
                 }
             });
         });
@@ -342,23 +332,13 @@
     function finishQuiz() {
         const finalUI = document.getElementById("final-ui");
         finalUI.style.display = "block";
-        playVideo('mp4/waiting_coffe_25Fps.mp4', false);
+        playVideo('https://sbercat.tourverse.ru/vid-4/waiting_coffe_25Fps.mp4', false);
 
-        document.getElementById("final-points").innerHTML = `
-          <div>
-            <div >Приходи в офис Сбера по адресу: Псков, Октябрьский пр., 23/25, пройди игру и получи диплом и приятный сюрприз.</div>
-            <div>До встречи, котан!</div>
-          </div>
-        `;
+        document.getElementById("final-points").innerHTML = `<div><div style="text-align: center; padding-bottom: 5px; ">Приходи в офис Сбера по адресу: Псков, Октябрьский пр., 23/25, пройди игру и получи диплом и приятный сюрприз.</div><div>До встречи, котан!</div></div>`;
+        fitTextToContainer(document.getElementById("final-points"), 44, 10);
     }
-    const friendAssetsConfig = {
-        video1: 'mp4/waiting_coffe_25Fps.mp4'
-    };
-
-    preloadAssets(friendAssetsConfig, () => {
-        init();
-        renderLoop();
-    }, ['main-content', 'final-ui', 'final-ui2', 'soundOverlay']);
+    init();
+    renderLoop();
 </script>
 <div id="camera-access-required"
      style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: black; color: white; text-align: center; z-index: 99999999;">

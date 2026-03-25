@@ -115,18 +115,18 @@ function initializeApp(stationConfig, stationNumber) {
 
     function updateSkipButtonVisibility() {
         let shouldShow = false;
-        if (activeVideo && !activeVideo.paused && !activeVideo.ended && activeVideo.currentSrc) {
-            const currentSrc = activeVideo.currentSrc;
+        if (activeVideo && !activeVideo.paused && !activeVideo.ended && (activeVideo.dataset.originalSrc || activeVideo.currentSrc)) {
+            const currentSrc = activeVideo.dataset.originalSrc || activeVideo.currentSrc;
             const fileName = currentSrc.split('/').pop();
 
             const isSpecialVideoByFullPath = currentSrc.includes(waitingVideo) ||
-                currentSrc.includes(correctAnswerVideo) ||
-                currentSrc.includes(wrongAnswerVideo) ||
-                (newStationVideo && currentSrc.includes(getPlatformVideoSrc(newStationVideo)));
+                                            currentSrc.includes(correctAnswerVideo) ||
+                                            currentSrc.includes(wrongAnswerVideo) ||
+                                            (newStationVideo && currentSrc.includes(getPlatformVideoSrc(newStationVideo)));
 
             const isSpecialVideoByFileName = fileName.includes('waiting') ||
-                fileName.includes('Da') ||
-                fileName.includes('NO');
+                                             fileName.includes('Da') ||
+                                             fileName.includes('NO');
 
             if (!isSpecialVideoByFullPath && !isSpecialVideoByFileName) {
                 shouldShow = true;
@@ -145,11 +145,10 @@ function initializeApp(stationConfig, stationNumber) {
     const urlParams = getUrlParams();
     const SCENE_UUID = urlParams.uuid || 'faf5826f-6089-42a9-a72c-9e19c95aca05';
     const STATION = stationNumber;
-    const isAndroid = /Android/i.test(navigator.userAgent);
+
     let activeVideo;
     let currentQuestionAudio = null;
     let onLastQuestion = false;
-    let currentWebcamStream = null;
     let shouldShowNextButtonAfterNewStationVideo = false;
 
     const startBtn = document.getElementById("startBtn");
@@ -261,30 +260,26 @@ function initializeApp(stationConfig, stationNumber) {
         }
     }
 
-    function getPlatformVideoSrc(src) {
-        third.style.display = 'block';
-        if (isAndroid) {
-            videoContainer.style.marginBottom = "2vh";
-            third.style.height = '12vh';
-            return src.replace(/\.mp4$/, '.webm');
-        }
-        return src;
-    }
+
 
     function playVideo(src, loop = false, forceSound = false, onPlayCallback = null) {
         if (!src) {
             console.error("playVideo called with invalid src");
-            return null; // Return null if src is invalid
+            return null;
         }
         let nextVideo = (activeVideo === video1) ? video2 : video1;
-        const videoSrc = getPlatformVideoSrc(src);
+
+        const platformSrc = getPlatformVideoSrc(src);
+        const videoSrc = (window.preloadedVideoBlobs && window.preloadedVideoBlobs[platformSrc]) || platformSrc;
+
+        nextVideo.dataset.originalSrc = platformSrc; // Store the original source
 
         nextVideo.loop = loop;
         nextVideo.preload = "auto";
         if (forceSound) nextVideo.muted = false;
-        if (!nextVideo.currentSrc || !nextVideo.currentSrc.includes(videoSrc)) {
-            nextVideo.src = videoSrc;
-        }
+
+        // Always set the src to handle blob url changes
+        nextVideo.src = videoSrc;
 
         nextVideo.load();
 
@@ -310,7 +305,7 @@ function initializeApp(stationConfig, stationNumber) {
             updateSkipButtonVisibility();
         }, { once: true });
 
-        return nextVideo; // Return the video element that was selected to play
+        return nextVideo;
     }
     function saveQuizState(stationNumber, state) {
         try {
@@ -466,7 +461,13 @@ function initializeApp(stationConfig, stationNumber) {
         onLastQuestion = false;
         playVideo(waitingVideo, true);
 
-        topAsk.innerHTML = `<div><div style="text-align: center; padding-bottom: 5px;font-size: 44px;">Отличная работа!</div><div>Ты прошёл станцию. Твои баллы: ${Number(sessionBalls + totalBalls)}</div></div>`;
+        topAsk.innerHTML = `<div>
+  <div style="text-align: center; padding-bottom: 5px;font-size: 44px;">
+    Отличная работа!
+  </div>
+  <div>Ты прошёл станцию. Твои баллы: ${Number(sessionBalls + totalBalls)}</div>
+  ${stationNumber === 4 ? '<div>Вперед на поиски финальной станции!</div>' : ''}
+</div>`;
         desc.textContent = '';
         ui.style.background = 'rgba(153,255,221,0)';
         ui.style.padding = '0';
@@ -491,7 +492,7 @@ function initializeApp(stationConfig, stationNumber) {
 
     function setupQuiz(stationConfig, stationNumber, introVideoElement) {
         skipVideoButton.style.display = 'block';
-        topAsk.innerHTML = `<div><div style="text-align: center; padding-bottom: 5px; font-size: 44px;">Привет, следопыт!</div><div style="align-items: center; display: flex">Смотри-ка, ты отлично справился — нашёл мои следы-подсказки!<br>Готов начать викторину?</p></div></div>`;
+        topAsk.innerHTML = `<div><div style="text-align: center; padding-bottom: 5px; font-size: 44px;">Привет, следопыт!</div><div style="align-items: center; display: flex">Смотри-ка, ты отлично справился — нашёл мои следы-подсказки!<br>${stationNumber === 2 ?'Готов начать викторину?' :'Готов продолжить викторину?'}</p></div></div>`;
         desc.textContent = '';
         ui.style.background = 'rgba(153,255,221,0)';
         ui.style.padding = '0';
@@ -536,40 +537,12 @@ function initializeApp(stationConfig, stationNumber) {
         });
     }
 
-    async function startWebcam() {
-        console.log('cam')
-        const videoElement = document.getElementById('webcam-feed');
-        const isBudgetAndroid = /Android/i.test(navigator.userAgent) && (navigator.deviceMemory || 8) < 8;
 
-        let videoConstraints = {
-            video: {
-                facingMode: { ideal: "environment" },
-                width: { ideal: 1280 },
-                height: { ideal: 720 },
-                frameRate: { ideal: 24, max: 24 }
-            },
-            audio: false
-        };
-
-        if (isBudgetAndroid) {
-            videoConstraints.video.width = { ideal: 240 };
-            videoConstraints.video.height = { ideal: 480 };
-            videoConstraints.video.frameRate = { ideal: 15, max: 15 };
-        }
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia(videoConstraints);
-            videoElement.srcObject = stream;
-            currentWebcamStream = stream;
-        } catch (err) {
-            console.error("Error accessing webcam: ", err);
-            // document.getElementById('camera-access-required').style.display = 'block';
-        }
-    }
 
     function stopWebcam() {
-        if (currentWebcamStream) {
-            currentWebcamStream.getTracks().forEach(track => track.stop());
-            currentWebcamStream = null;
+        if (window.currentWebcamStream) {
+            window.currentWebcamStream.getTracks().forEach(track => track.stop());
+            window.currentWebcamStream = null;
         }
     }
 
@@ -597,7 +570,7 @@ function initializeApp(stationConfig, stationNumber) {
 
     function renderLoop() {
         if (activeVideo && !activeVideo.paused && !activeVideo.ended) {
-            applyChromaKey(activeVideo);
+                applyChromaKey(activeVideo);
         }
         // updateSkipButtonVisibility();
         requestAnimationFrame(renderLoop);
@@ -616,15 +589,22 @@ function initializeApp(stationConfig, stationNumber) {
     activeVideo = video1;
 
     function videoEndedCallback(videoElement) {
-        const videoSource = decodeURIComponent(videoElement.currentSrc || "");
+        const videoSource = decodeURIComponent(videoElement.dataset.originalSrc || videoElement.currentSrc || "");
+        
         if (videoSource.includes(introVideo.replace(".mp4", ""))) {
             // startBtn.style.display = "block"; // Removed, now handled by setupInitialNextButton
         }
-        if (videoSource.includes(wrongStationVideo.replace(".mp4", ""))) {
+        if (videoSource.includes('cat_2_scene_wrong_station_25Fps')) {
             const wrongBtn = document.getElementById("wrongStationBtn");
             if (wrongBtn) wrongBtn.style.display = "block";
         }
-        if (onLastQuestion && newStationVideo && videoSource.includes(correctAnswerVideo.replace(".mp4", ""))) {
+        
+        // --- Start of Robust Check Fix ---
+        const correctAnswerFileName = correctAnswerVideo.split('/').pop().replace('.mp4', '');
+        const videoSourceFileName = videoSource.split('/').pop().split('.')[0];
+        
+        if (onLastQuestion && newStationVideo && videoSourceFileName.includes(correctAnswerFileName)) {
+        // --- End of Robust Check Fix ---
             onLastQuestion = false;
             shouldShowNextButtonAfterNewStationVideo = true;
             playVideo(newStationVideo, false, true);
@@ -654,7 +634,7 @@ function initializeApp(stationConfig, stationNumber) {
             videoEndedCallback(this);
         });
     });
-
+    
     const currentFile = window.location.pathname.split('/').pop();
     let expectedStation = localStorage.getItem('currentStation');
 
@@ -712,7 +692,8 @@ function initializeApp(stationConfig, stationNumber) {
                 if (activeVideo.ended || isVideoNearEnd) {
                     videoEndedCallback(activeVideo);
 
-                    if (shouldShowNextButtonAfterNewStationVideo && activeVideo.currentSrc.includes(newStationVideo.replace(".mp4", ""))) {
+                    const videoSource = activeVideo.dataset.originalSrc || activeVideo.currentSrc || "";
+                    if (shouldShowNextButtonAfterNewStationVideo && videoSource.includes(newStationVideo.replace(".mp4", ""))) {
                         if (!document.querySelector('#controls .primary')) {
                             shouldShowNextButtonAfterNewStationVideo = false;
                             const nextBtn = document.createElement('button');

@@ -1,12 +1,12 @@
 
 const stationConfigs = {
   2: {
-    introVideo: 'mp4/cat_2_scene_25Fps.mp4',
-    waitingVideo: 'mp4/cat_2_scene_waiting_25Fps 3_1.mp4',
-    newStationVideo: 'mp4/cat_2_scene_new_station_25Fps.mp4',
-    wrongStationVideo: 'mp4/cat_2_scene_wrong_station_25Fps 2_1.mp4',
-    correctAnswerVideo: 'mp4/Da_25Fps.mp4',
-    wrongAnswerVideo: 'mp4/NO_2_25Fps.mp4',
+    introVideo: 'https://sbercat.tourverse.ru/vid-4/cat_2_scene_25Fps.mp4',
+    waitingVideo: 'https://sbercat.tourverse.ru/vid-4/cat_2_scene_waiting_25Fps 3_1.mp4',
+    newStationVideo: 'https://sbercat.tourverse.ru/vid-4/cat_2_scene_new_station_25Fps.mp4',
+    wrongStationVideo: 'https://sbercat.tourverse.ru/vid-4/cat_2_scene_wrong_station_25Fps 2_1.mp4',
+    correctAnswerVideo: 'https://sbercat.tourverse.ru/vid-4/Da_25Fps.mp4',
+    wrongAnswerVideo: 'https://sbercat.tourverse.ru/vid-4/NO_2_25Fps.mp4',
     nextStation: 'mainStation3.html',
     questionPool: [
       {
@@ -118,12 +118,12 @@ const stationConfigs = {
     ]
   },
   3: {
-    introVideo: 'mp4/cat_3_1_scen_25Fps.mp4',
-    waitingVideo: 'mp4/waiting_coffe_25Fps.mp4',
-    newStationVideo: 'mp4/cat_3_2_scen_25Fps.mp4',
-    wrongStationVideo: 'mp4/cat_2_scene_wrong_station_25Fps 2_1.mp4',
-    correctAnswerVideo: 'mp4/Da_25Fps.mp4',
-    wrongAnswerVideo: 'mp4/NO_2_25Fps.mp4',
+    introVideo: 'https://sbercat.tourverse.ru/vid-4/cat_3_1_scen_25Fps.mp4',
+    waitingVideo: 'https://sbercat.tourverse.ru/vid-4/waiting_coffe_25Fps.mp4',
+    newStationVideo: 'https://sbercat.tourverse.ru/vid-4/cat_3_2_scen_25Fps.mp4',
+    wrongStationVideo: 'https://sbercat.tourverse.ru/vid-4/cat_2_scene_wrong_station_25Fps 2_1.mp4',
+    correctAnswerVideo: 'https://sbercat.tourverse.ru/vid-4/Da_25Fps.mp4',
+    wrongAnswerVideo: 'https://sbercat.tourverse.ru/vid-4/NO_2_25Fps.mp4',
     nextStation: 'mainStation4.html',
     questionPool: [
         {
@@ -235,11 +235,11 @@ const stationConfigs = {
     ]
   },
   4: {
-    introVideo: 'mp4/cat_4_scene_25Fps.mp4',
-    waitingVideo: 'mp4/waiting_coffe_25Fps.mp4',
-    wrongStationVideo: 'mp4/cat_2_scene_wrong_station_25Fps 2_1.mp4',
-    correctAnswerVideo: 'mp4/Da_25Fps.mp4',
-    wrongAnswerVideo: 'mp4/NO_2_25Fps.mp4',
+    introVideo: 'https://sbercat.tourverse.ru/vid-4/cat_4_scene_25Fps.mp4',
+    waitingVideo: 'https://sbercat.tourverse.ru/vid-4/waiting_coffe_25Fps.mp4',
+    wrongStationVideo: 'https://sbercat.tourverse.ru/vid-4/cat_2_scene_wrong_station_25Fps 2_1.mp4',
+    correctAnswerVideo: 'https://sbercat.tourverse.ru/vid-4/Da_25Fps.mp4',
+    wrongAnswerVideo: 'https://sbercat.tourverse.ru/vid-4/NO_2_25Fps.mp4',
     nextStation: 'final.html',
     questionPool: [
       {

@@ -168,7 +168,11 @@ function drawCat() {
 
 function getPlatformVideoSrc(src) {
     if (isAndroid) {
-        return src.replace(/\.mp4$/, '.webm');
+        let newSrc = src.replace(/\.mp4$/, '.webm');
+        if (isBudgetAndroid) {
+            newSrc = newSrc.replace('mp4/', '3/');
+        }
+        return newSrc;
     }
     return src;
 }
