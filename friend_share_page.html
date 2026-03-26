@@ -317,7 +317,7 @@
         videos.forEach(v => {
             v.addEventListener('ended', function () {
                 if (!v.loop) {
-                    playVideo('/mp4/waiting_coffe_25Fps.mp4', true);
+                    playVideo('https://nicka-cc.github.io/sbercat2/mp4/waiting_coffe_25Fps.mp4', true);
                 }
             });
         });
@@ -332,7 +332,7 @@
     function finishQuiz() {
         const finalUI = document.getElementById("final-ui");
         finalUI.style.display = "block";
-        playVideo('/mp4/waiting_coffe_25Fps.mp4', false);
+        playVideo('https://nicka-cc.github.io/sbercat2/mp4/waiting_coffe_25Fps.mp4', false);
 
         document.getElementById("final-points").innerHTML = `<div><div style="text-align: center; padding-bottom: 5px; ">Приходи в офис Сбера по адресу: Псков, Октябрьский пр., 23/25, пройди игру и получи диплом и приятный сюрприз.</div><div>До встречи, котан!</div></div>`;
         fitTextToContainer(document.getElementById("final-points"), 44, 10);

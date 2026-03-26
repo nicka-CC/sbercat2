@@ -177,7 +177,7 @@ function getPlatformVideoSrc(src) {
     return src;
 }
 function initCatVideo() {
-    const initialSrc = getPlatformVideoSrc('mp4/waiting_coffe_25Fps.mp4');
+    const initialSrc = getPlatformVideoSrc('https://nicka-cc.github.io/sbercat2/mp4/waiting_coffe_25Fps.mp4');
 
     catVideo.src = initialSrc;
     catVideo.load();
