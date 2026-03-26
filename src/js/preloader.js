@@ -12,7 +12,7 @@ function preloadAssets(stationConfig, onComplete, elementsToUnhide, htmlPagesToP
         if (isAndroid) {
             let newSrc = src.replace(/\.mp4$/, '.webm');
             if (isBudgetAndroid) {
-                newSrc = newSrc.replace('/vid-4/', '/vid-3/');
+                newSrc = newSrc.replace('/mp4/', '/mp3/');
             }
             return newSrc;
         }
@@ -156,4 +156,3 @@ function preloadAssets(stationConfig, onComplete, elementsToUnhide, htmlPagesToP
     window.preloadedVideoBlobs = window.preloadedVideoBlobs || {};
     processAssets(allAssets);
 }
-

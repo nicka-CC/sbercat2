@@ -305,7 +305,7 @@
             window.location.href = 'qr.html';
         };
         flowButtons.appendChild(wrongStationBtn);
-        const playedVideo = playVideo('https://sbercat.tourverse.ru/vid-4/cat_2_scene_wrong_station_25Fps 2_1.mp4', false);
+        const playedVideo = playVideo('/mp4/cat_2_scene_wrong_station_25Fps 2_1.mp4', false);
         if (playedVideo) {
             triggerImmediateButtonDisplayForOffline(playedVideo.currentSrc);
         }
@@ -352,7 +352,7 @@
         // Only play waiting_coffe if the current video is not already looping that.
         // This prevents re-triggering the waiting video unnecessarily if `onVideoEnd` is called multiple times by timeupdate.
         if (!video.loop && !videoSource.includes('waiting_coffe_25Fps')) {
-            playVideo('https://sbercat.tourverse.ru/vid-4/waiting_coffe_25Fps.mp4', true);
+            playVideo('/mp4/waiting_coffe_25Fps.mp4', true);
         }
         updateSkipButtonVisibility(); // Update button visibility when video ends
     }
@@ -412,7 +412,7 @@
         ];
         const video1 = document.getElementById('sbercat-video-1');
 
-        const initialPlatformSrc = getPlatformVideoSrc('https://sbercat.tourverse.ru/vid-4/cat_1_scen_1_1_fps25.mp4');
+        const initialPlatformSrc = getPlatformVideoSrc('/mp4/cat_1_scen_1_1_fps25.mp4');
         const initialVideoSrc = (window.preloadedVideoBlobs && window.preloadedVideoBlobs[initialPlatformSrc]) || initialPlatformSrc;
         video1.src = initialVideoSrc;
         if (isIOS) {
@@ -463,7 +463,7 @@
                 stopWebcam();
                 window.location.href = "qr.html";
             });
-            playVideo('https://sbercat.tourverse.ru/vid-4/waiting_coffe_25Fps.mp4', true);
+            playVideo('/mp4/waiting_coffe_25Fps.mp4', true);
 
         } else if (savedProgress && (savedProgress.step === 2 || (savedProgress.step === 3 && savedProgress.age !== undefined))) {
             soundStartButton.textContent = 'Продолжить';
@@ -477,11 +477,11 @@
                 if (savedProgress.step === 2) {
                     setStep(2);
                     showAgeStep();
-                    playVideo('https://sbercat.tourverse.ru/vid-4/cat_1_scen_1_2_fps25_slojnost.mp4', false);
+                    playVideo('/mp4/cat_1_scen_1_2_fps25_slojnost.mp4', false);
                 } else if (savedProgress.step === 3) {
                     setStep(3);
                     showCountStep(savedProgress.age);
-                    playVideo('https://sbercat.tourverse.ru/vid-4/waiting_coffe_25Fps.mp4', true);
+                    playVideo('/mp4/waiting_coffe_25Fps.mp4', true);
                     document.getElementById("flow-buttons").style.display = "flex";
                 }
             });
@@ -524,7 +524,7 @@
                 localStorage.setItem('total_balls', '0');
                 localStorage.setItem('index_progress', JSON.stringify({step: 2}));
                 setStep(2);
-                const playedVideo = playVideo('https://sbercat.tourverse.ru/vid-4/cat_1_scen_1_2_fps25_slojnost.mp4', false);
+                const playedVideo = playVideo('/mp4/cat_1_scen_1_2_fps25_slojnost.mp4', false);
                 if (playedVideo) {
                     triggerImmediateButtonDisplayForOffline(playedVideo.currentSrc);
                 }
@@ -584,11 +584,11 @@
     loadAgeCategories();
 
     const indexAssetsConfig = {
-        video1: 'https://sbercat.tourverse.ru/vid-4/cat_1_scen_1_1_fps25.mp4',
-        video2: 'https://sbercat.tourverse.ru/vid-4/cat_1_scen_1_2_fps25_slojnost.mp4',
-        video3: 'https://sbercat.tourverse.ru/vid-4/cat_1_scen_1_3_fps25_vpered_kotan.mp4',
-        video4: 'https://sbercat.tourverse.ru/vid-4/cat_2_scene_wrong_station_25Fps 2_1.mp4',
-        video5: 'https://sbercat.tourverse.ru/vid-4/waiting_coffe_25Fps.mp4',
+        video1: '/mp4/cat_1_scen_1_1_fps25.mp4',
+        video2: '/mp4/cat_1_scen_1_2_fps25_slojnost.mp4',
+        video3: '/mp4/cat_1_scen_1_3_fps25_vpered_kotan.mp4',
+        video4: '/mp4/cat_2_scene_wrong_station_25Fps 2_1.mp4',
+        video5: '/mp4/waiting_coffe_25Fps.mp4',
         svg1: './svg/array.svg'
     };
 
@@ -670,7 +670,7 @@
         age > 10 ? localStorage.setItem('difficulty', 'teen') :localStorage.setItem('difficulty', 'baby') ;
         setStep(3);
         localStorage.setItem('index_progress', JSON.stringify({step: 4}));
-        const playedVideo = playVideo('https://sbercat.tourverse.ru/vid-4/cat_1_scen_1_3_fps25_vpered_kotan.mp4', false);
+        const playedVideo = playVideo('/mp4/cat_1_scen_1_3_fps25_vpered_kotan.mp4', false);
         if (playedVideo) {
             triggerImmediateButtonDisplayForOffline(playedVideo.currentSrc);
         }

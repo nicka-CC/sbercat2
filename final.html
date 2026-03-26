@@ -75,7 +75,7 @@
             <canvas id="cat-canvas"></canvas>
             <video id="sbercat-video" playsinline muted crossorigin="anonymous"
                    style="position: absolute; width: 100%; object-fit: contain; display: none; z-index: 3;">
-                <source src="https://sbercat.tourverse.ru/vid-4/Scen_5_25fps.mp4" type="video/mp4">
+                <source src="/mp4/Scen_5_25fps.mp4" type="video/mp4">
                 Ваш браузер не поддерживает видео.
             </video>
             <video id="sbercat-video-2" playsinline muted crossorigin="anonymous"
@@ -368,7 +368,7 @@
         finalUi2.appendChild(wrongStationBtn);
 
 
-        playVideo('https://sbercat.tourverse.ru/vid-4/cat_2_scene_wrong_station_25Fps 2_1.mp4', false);
+        playVideo('/mp4/cat_2_scene_wrong_station_25Fps 2_1.mp4', false);
     }
 
     function init() {
@@ -414,7 +414,7 @@
                     document.getElementById("wrong-btn").style.display = "block";
                 }
                 if (!v.loop) {
-                    playVideo('https://sbercat.tourverse.ru/vid-4/waiting_coffe_25Fps.mp4', true);
+                    playVideo('/mp4/waiting_coffe_25Fps.mp4', true);
                 }
                 updateSkipButtonVisibility();
             });
@@ -452,7 +452,7 @@
         createStatistics(SCENE_UUID, STATION);
         const finalUI = document.getElementById("final-ui");
         finalUI.style.display = "block";
-        playVideo('https://sbercat.tourverse.ru/vid-4/Scen_5_25fps.mp4', false);
+        playVideo('/mp4/Scen_5_25fps.mp4', false);
         function getCoinDeclension(number) {
             number = Math.abs(number);
             if (number % 10 === 1 && number % 100 !== 11) return 'монета';
@@ -492,9 +492,9 @@
     }
 
     const finalAssetsConfig = {
-        finalVideo: 'https://sbercat.tourverse.ru/vid-4/Scen_5_25fps.mp4',
-        waitingVideo: 'https://sbercat.tourverse.ru/vid-4/waiting_coffe_25Fps.mp4',
-        wrongStationVideo: 'https://sbercat.tourverse.ru/vid-4/cat_2_scene_wrong_station_25Fps 2_1.mp4'
+        finalVideo: '/mp4/Scen_5_25fps.mp4',
+        waitingVideo: '/mp4/waiting_coffe_25Fps.mp4',
+        wrongStationVideo: '/mp4/cat_2_scene_wrong_station_25Fps 2_1.mp4'
     };
 
     preloadAssets(finalAssetsConfig, () => {
