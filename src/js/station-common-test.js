@@ -370,7 +370,7 @@ function initializeApp(stationConfig, stationNumber) {
         canvas.height = videoContainer.offsetHeight;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        const cropPercent = 0.15;
+        const cropPercent = 0;
         const sx = 0;
         const sy = videoElement.videoHeight * cropPercent;
         const sWidth = videoElement.videoWidth;

@@ -289,7 +289,7 @@
         const contH = container.offsetHeight;
         const vW = videoElement.videoWidth;
         const vH = videoElement.videoHeight;
-        const cropPercent = 0;
+        const cropPercent = 0.5;
         const croppedHeight = vH * (1 - cropPercent);
         const scale = Math.min(contW / vW, contH / croppedHeight);
         const finalW = vW * scale;
@@ -307,7 +307,7 @@
     function applyChromaKey(videoElement) {
         if (isAndroid || !webglProcessor || !videoElement.videoWidth) return;
 
-        const cropPercent = 0.13;
+        const cropPercent = 0;
         const crop = {
             x: 0,
             y: cropPercent,
