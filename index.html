@@ -75,7 +75,7 @@
     </div>
 
     <div id="cat-container">
-        <canvas id="cat-canvas" style="height: 110%; width:100%; object-fit: cover;"></canvas>
+        <canvas id="cat-canvas" style="height: 100%; width:100%; object-fit: cover;"></canvas>
         <video id="sbercat-video-1" playsinline muted crossorigin="anonymous"
                style="display: none; width: 100%; object-fit: contain">
             Ваш браузер не поддерживает видео.
@@ -314,7 +314,7 @@
     function applyChromaKey(videoElement) {
         if (isAndroid || !webglProcessor || !videoElement.videoWidth) return;
 
-        const cropPercent = 0.15;
+        const cropPercent = 0;
         const crop = {
             x: 0,
             y: cropPercent,

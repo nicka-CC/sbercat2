@@ -552,7 +552,7 @@ function initializeApp(stationConfig, stationNumber) {
     function applyChromaKey(videoElement) {
         if (isAndroid || !webglProcessor || !videoElement.videoWidth) return;
 
-        const cropPercent = 0.15;
+        const cropPercent = 0;
         const crop = {
             x: 0,
             y: cropPercent,

@@ -19,6 +19,7 @@ function getPlatformVideoSrc(src) {
     if (third) {
         third.style.display = 'block';
     }
+
     if (isAndroid) {
         if(videoContainer) videoContainer.style.marginBottom = "2vh";
         if (third) {
@@ -26,11 +27,15 @@ function getPlatformVideoSrc(src) {
         }
         let newSrc = src.replace(/\.mp4$/, '.webm');
         if (isBudgetAndroid) {
-            newSrc = newSrc.replace('/mp4/', '/mp3/');
+            // For budget androids, use webm from folder /3/
+            newSrc = newSrc.replace('/mp4/', '/3/');
         }
+        // For non-budget androids, it will use webm from /mp4/, which is the default for androids.
         return newSrc;
+    } else {
+        // For non-android devices (iOS, desktop), use mp4 from folder /2/
+        return src.replace('/mp4/', '/2/');
     }
-    return src;
 }
 
 async function startWebcam() {
