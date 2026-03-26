@@ -28,13 +28,13 @@ function getPlatformVideoSrc(src) {
         let newSrc = src.replace(/\.mp4$/, '.webm');
         if (isBudgetAndroid) {
             // For budget androids, use webm from folder /3/
-            newSrc = newSrc.replace('/mp4/', '/3/');
+            newSrc = newSrc.replace('https://nicka-cc.github.io/sbercat2/mp4/', 'https://nicka-cc.github.io/sbercat2/3/');
         }
-        // For non-budget androids, it will use webm from /mp4/, which is the default for androids.
+        // For non-budget androids, it will use webm from /mp4/', which is the default for androids.
         return newSrc;
     } else {
         // For non-android devices (iOS, desktop), use mp4 from folder /2/
-        return src.replace('/mp4/', '/2/');
+        return src.replace('https://nicka-cc.github.io/sbercat2/mp4/', 'https://nicka-cc.github.io/sbercat2/2/');
     }
 }
 
